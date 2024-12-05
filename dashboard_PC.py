@@ -43,11 +43,21 @@ selected_dates = st.sidebar.date_input(
 # Filter the data by selected dates (make sure we convert to date before comparison)
 filtered_data = filtered_data[filtered_data['dateCreated'].dt.date.between(selected_dates[0], selected_dates[1])]
 
-# Create filters for other columns (e.g., hours, sessions, etc.)
-selected_hours = st.sidebar.multiselect(
-    "Select hours", options=sorted(filtered_data['hours'].unique()), default=sorted(filtered_data['hours'].unique())
+
+
+# Define the fixed hour range for the slider (8 AM to 12 AM)
+hour_range = st.sidebar.slider(
+    "Select hour range",
+    min_value=8,  # Start from 8 AM
+    max_value=24,  # End at midnight (24 hours format)
+    value=(8, 24)  # Default selection
 )
-filtered_data = filtered_data[filtered_data['hours'].isin(selected_hours)]
+
+# Filter the data based on the selected hour range
+filtered_data = filtered_data[
+    (filtered_data['hours'] >= hour_range[0]) & (filtered_data['hours'] <= hour_range[1])
+]
+
 
 # Add sliders for sessions, quotes, and transactions
 min_sessions, max_sessions = int(filtered_data['sessions'].min()), int(filtered_data['sessions'].max())
@@ -67,6 +77,25 @@ transaction_filter = st.sidebar.slider(
     "Select transaction range",
     min_value=min_transactions, max_value=max_transactions, value=(min_transactions, max_transactions)
 )
+
+
+
+# Add a checkbox in the sidebar to exclude weekends
+exclude_weekends = st.sidebar.checkbox("Exclude Weekends", value=False)
+
+# Add a column to identify weekends (Saturday = 5, Sunday = 6)
+filtered_data['is_weekend'] = filtered_data['dateCreated'].dt.weekday.isin([5, 6])
+
+# Apply the filter to exclude weekends if the checkbox is selected
+if exclude_weekends:
+    filtered_data = filtered_data[~filtered_data['is_weekend']]
+
+
+
+
+
+
+
 
 # Apply the session filter
 filtered_data_sessions = filtered_data[(
