@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 import numpy as np
 
 # Load the data (replace with your actual file path)
-data = pd.read_csv(r"C:\Users\username\Documents\Conversion_data_PC.csv")
+data = pd.read_csv(r"./Conversion_data_PC.csv")
 
 # Ensure 'dateCreated' is parsed correctly, assuming format is 'DD/MM/YYYY'
 def parse_date(date_string):
